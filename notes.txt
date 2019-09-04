@@ -1,1 +1,9 @@
-Project notes
+Project notes - Intro to git + python 
+
+Testing pull and push
+
+git status
+
+git config
+
+git config --list
