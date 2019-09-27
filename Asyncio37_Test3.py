@@ -5,18 +5,22 @@ from tornado.options import define, options
 import logging
 from datetime import datetime, date,timedelta
 
-logging.basicConfig(filename='tempServerLogger.log',filemode='a',level=logging.WARNING,
+logging.basicConfig(filename='serverLogger.log',filemode='a',level=logging.WARNING,
                     format='%(asctime)s - %(levelname)s - %(message)s')
+logging.getLogger('tornado.access').disabled = True
+define("port", default=8000, help="run on the given port", type=int)
 
 async def bgTask():
     while True:
         try: 
            NOW = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
            logging.debug(NOW)
-           await gen.sleep(3600)
+           print(NOW)
+           #await gen.sleep(3600)
+           await gen.sleep(1)
         except Exception as ex:
-           #logging.error("Error: ",ex)
-           logging.error('exiting.')
+           print(ex)
+           print('exiting.')
            break 
 
 async def runAll():
@@ -31,10 +35,16 @@ class HomeHandler(tornado.web.RequestHandler):
     def get(self):
         self.write("Hello, world")
 
+class StopServer(tornado.web.RequestHandler):
+    def get(self):
+        tornado.ioloop.IOLoop.instance().stop()
+
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
-            (r'/', HomeHandler),]
+            (r'/', HomeHandler),
+            (r"/stop", StopServer),
+        ]
         tornado.web.Application.__init__(self, handlers)
 
 
